@@ -1,0 +1,281 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    background-color: #0d1b2a;
+    color: #e0e1dd;
+    overflow: hidden;
+}
+
+/* Sidebar styles */
+.sidebar-toggle {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1002;
+    background-color: #1b263b;
+    color: #e0e1dd;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+    background-color: #415a77;
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 320px;
+    background-color: #1b263b;
+    z-index: 1001;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar.open {
+    transform: translateX(0);
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #415a77;
+}
+
+.sidebar-close {
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #778da9;
+}
+
+.sidebar-close:hover {
+    color: #e0e1dd;
+}
+
+.sidebar-content {
+    padding: 1rem;
+}
+
+.control-group {
+    margin-bottom: 1rem;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.control-group select,
+.control-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #415a77;
+    color: #e0e1dd;
+}
+
+.sidebar-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #415a77;
+    color: #e0e1dd;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.3s;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-btn:hover {
+    background-color: #778da9;
+}
+
+.sidebar-btn i {
+    margin-right: 0.5rem;
+    width: 20px;
+    text-align: center;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.slider-container input[type="range"] {
+    flex: 1;
+}
+
+.stats {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background-color: rgba(65, 90, 119, 0.3);
+    border-radius: 8px;
+}
+
+.stats h3 {
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #415a77;
+    padding-bottom: 0.5rem;
+}
+
+.stat-item {
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.stat-value {
+    font-weight: bold;
+    color: #778da9;
+}
+
+.legend {
+    margin-top: 1.5rem;
+}
+
+.legend h3 {
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #415a77;
+    padding-bottom: 0.5rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.5rem;
+    border-radius: 6px;
+}
+
+#map {
+    flex: 1;
+    z-index: 1;
+    margin-left: 0;
+    transition: margin-left 0.3s ease;
+}
+
+body.sidebar-open #map {
+    margin-left: 320px;
+}
+
+.info-panel {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background-color: rgba(27, 38, 59, 0.92);
+    padding: 1rem;
+    border-radius: 8px;
+    z-index: 1000;
+    max-width: 320px;
+    backdrop-filter: blur(8px);
+}
+
+.aircraft-info {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #778da9;
+}
+
+.loading {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(27, 38, 59, 0.95);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    z-index: 1001;
+    text-align: center;
+}
+
+.performance-controls {
+    margin: 1.5rem 0;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 280px;
+    }
+
+    body.sidebar-open #map {
+        margin-left: 280px;
+    }
+
+    .info-panel {
+        max-width: 200px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Aircraft icon styles */
+.aircraft-icon {
+    transition: transform 0.25s linear;
+    display: block;
+}
+
+.aircraft-icon.commercial {
+    color: #4cc9f0;
+}
+
+.aircraft-icon.private {
+    color: #f72585;
+}
+
+.aircraft-icon.cargo {
+    color: #7209b7;
+}
+
+.aircraft-icon.military {
+    color: #3a0ca3;
+}
+
+.aircraft-icon.general {
+    color: #4361ee;
+}
+
+.aircraft-marker {
+    pointer-events: auto;
+}
+
+/* small visual helper for popup readability */
+.leaflet-popup-content-wrapper {
+    background: rgba(20, 30, 40, 0.98);
+    color: #e0e1dd;
+}
