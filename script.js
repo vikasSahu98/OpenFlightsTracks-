@@ -5,6 +5,40 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+// ------------------------- Basemaps -------------------------
+const baseLayers = {
+    "OpenStreetMap": L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a>'
+    }),
+
+    "Carto Light": L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        subdomains: "abcd",
+        maxZoom: 20
+    }),
+
+    "Carto Dark": L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        subdomains: "abcd",
+        maxZoom: 20
+    }),
+
+    "Satellite (ESRI)": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+        attribution: "Tiles © Esri &mdash; Source: Esri, Earthstar Geographics"
+    })
+};
+
+// Set default base map
+baseLayers["OpenStreetMap"].addTo(map);
+
+// Add basemap control
+L.control.layers(baseLayers, null, { position: "topright" }).addTo(map);
+
+// ------------------------- Zoom control at bottom-left -------------------------
+map.zoomControl.remove(); // remove default top-left zoom
+L.control.zoom({ position: "bottomright" }).addTo(map);
+
+
 // Performance & state
 let updateInterval = 3000; // ms
 let maxFlightsToShow = 100;
@@ -28,8 +62,8 @@ function createAircraftIcon(category) {
     const className = `aircraft-icon ${category || ''}`;
     return L.divIcon({
         html: `<svg width="28" height="28" viewBox="0 0 24 24" class="${className}">
-                                <path fill="currentColor" d="M22 16v-2l-8.5-5V3.5c0-.83-.67-1.5-1.5-1.5S10.5 2.67 10.5 3.5V9L2 14v2l8.5-2.5V19L8 20.5V22l4-1 4 1v-1.5L13.5 19v-5.5L22 16z"/>
-                               </svg>`,
+                                    <path fill="currentColor" d="M22 16v-2l-8.5-5V3.5c0-.83-.67-1.5-1.5-1.5S10.5 2.67 10.5 3.5V9L2 14v2l8.5-2.5V19L8 20.5V22l4-1 4 1v-1.5L13.5 19v-5.5L22 16z"/>
+                                   </svg>`,
         className: 'aircraft-marker',
         iconSize: [28, 28],
         iconAnchor: [14, 14]
@@ -142,13 +176,13 @@ function processFlightData(data) {
 
                     // update popup content
                     const popupContent = `\
-                                        <strong>${state.callsign}</strong><br>\
-                                        ICAO24: ${icao24}<br>\
-                                        Country: ${state.originCountry}<br>\
-                                        Type: ${state.category}<br>\
-                                        Altitude: ${state.baroAltitude ? Math.round(state.baroAltitude) + ' m' : 'N/A'}<br>\
-                                        Velocity: ${state.velocity ? Math.round(state.velocity * 3.6) + ' km/h' : 'N/A'}<br>\
-                                        Track: ${state.trueTrack ? Math.round(state.trueTrack) + '°' : 'N/A'}`;
+                                            <strong>${state.callsign}</strong><br>\
+                                            ICAO24: ${icao24}<br>\
+                                            Country: ${state.originCountry}<br>\
+                                            Type: ${state.category}<br>\
+                                            Altitude: ${state.baroAltitude ? Math.round(state.baroAltitude) + ' m' : 'N/A'}<br>\
+                                            Velocity: ${state.velocity ? Math.round(state.velocity * 3.6) + ' km/h' : 'N/A'}<br>\
+                                            Track: ${state.trueTrack ? Math.round(state.trueTrack) + '°' : 'N/A'}`;
 
                     marker.getPopup() && marker.setPopupContent(popupContent);
 
@@ -179,28 +213,28 @@ function processFlightData(data) {
                     marker.on('add', () => applyRotationToMarker(marker, marker._track));
 
                     const popupContent = `\
-                                        <strong>${state.callsign}</strong><br>\
-                                        ICAO24: ${icao24}<br>\
-                                        Country: ${state.originCountry}<br>\
-                                        Type: ${state.category}<br>\
-                                        Altitude: ${state.baroAltitude ? Math.round(state.baroAltitude) + ' m' : 'N/A'}<br>\
-                                        Velocity: ${state.velocity ? Math.round(state.velocity * 3.6) + ' km/h' : 'N/A'}<br>\
-                                        Track: ${state.trueTrack ? Math.round(state.trueTrack) + '°' : 'N/A'}`;
-
-                    marker.bindPopup(popupContent);
-
-                    marker.on('click', () => {
-                        const detailsElement = document.getElementById('aircraft-details');
-                        detailsElement.innerHTML = `\
                                             <strong>${state.callsign}</strong><br>\
                                             ICAO24: ${icao24}<br>\
                                             Country: ${state.originCountry}<br>\
                                             Type: ${state.category}<br>\
                                             Altitude: ${state.baroAltitude ? Math.round(state.baroAltitude) + ' m' : 'N/A'}<br>\
                                             Velocity: ${state.velocity ? Math.round(state.velocity * 3.6) + ' km/h' : 'N/A'}<br>\
-                                            Track: ${state.trueTrack ? Math.round(state.trueTrack) + '°' : 'N/A'}<br>\
-                                            Vertical Rate: ${state.verticalRate ? Math.round(state.verticalRate) + ' m/s' : 'N/A'}<br>\
-                                            On Ground: ${state.onGround ? 'Yes' : 'No'}`;
+                                            Track: ${state.trueTrack ? Math.round(state.trueTrack) + '°' : 'N/A'}`;
+
+                    marker.bindPopup(popupContent);
+
+                    marker.on('click', () => {
+                        const detailsElement = document.getElementById('aircraft-details');
+                        detailsElement.innerHTML = `\
+                                                <strong>${state.callsign}</strong><br>\
+                                                ICAO24: ${icao24}<br>\
+                                                Country: ${state.originCountry}<br>\
+                                                Type: ${state.category}<br>\
+                                                Altitude: ${state.baroAltitude ? Math.round(state.baroAltitude) + ' m' : 'N/A'}<br>\
+                                                Velocity: ${state.velocity ? Math.round(state.velocity * 3.6) + ' km/h' : 'N/A'}<br>\
+                                                Track: ${state.trueTrack ? Math.round(state.trueTrack) + '°' : 'N/A'}<br>\
+                                                Vertical Rate: ${state.verticalRate ? Math.round(state.verticalRate) + ' m/s' : 'N/A'}<br>\
+                                                On Ground: ${state.onGround ? 'Yes' : 'No'}`;
                     });
 
                     aircraftMarkers[icao24] = marker;
@@ -389,13 +423,47 @@ document.getElementById('toggle-animation').addEventListener('click', function (
 
 // Sidebar toggle functionality
 document.getElementById('sidebar-toggle').addEventListener('click', function () {
-    document.getElementById('sidebar').classList.add('open');
-    document.body.classList.add('sidebar-open');
+    const sidebar = document.getElementById('sidebar');
+    const isClosing = sidebar.classList.contains('closed');
+
+    if (isClosing) {
+        sidebar.classList.remove('closed');
+        document.body.classList.remove('sidebar-closed');
+        document.body.classList.add('sidebar-open');
+        this.style.left = '335px';
+        this.innerHTML = '<i class="fas fa-times"></i>';
+    } else {
+        sidebar.classList.add('closed');
+        document.body.classList.remove('sidebar-open');
+        document.body.classList.add('sidebar-closed');
+        this.style.left = '15px';
+        this.innerHTML = '<i class="fas fa-bars"></i>';
+    }
+
+    // Trigger map resize to ensure it renders correctly
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 300);
 });
 
 document.getElementById('sidebar-close').addEventListener('click', function () {
-    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar').classList.add('closed');
     document.body.classList.remove('sidebar-open');
+    document.body.classList.add('sidebar-closed');
+    document.getElementById('sidebar-toggle').style.left = '15px';
+    document.getElementById('sidebar-toggle').innerHTML = '<i class="fas fa-bars"></i>';
+
+    // Trigger map resize
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 300);
+});
+
+// Add map resize handler for window resize
+window.addEventListener('resize', function () {
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 100);
 });
 
 // cleanup on unload
