@@ -44,6 +44,8 @@ let updateInterval = 3000; // ms
 let maxFlightsToShow = 100;
 let animationEnabled = true;
 let intervalId = null;
+let altitudeUnit = 'm'; // 'm' or 'ft'
+let speedUnit = 'kmh';  // 'kmh' or 'kn'
 
 // Storage: markers, tracks, raw data
 const aircraftMarkers = {};   // icao24 -> L.marker
@@ -141,6 +143,20 @@ function processFlightData(data) {
     let activeCount = 0;
     let visibleCount = 0;
 
+    // Helper function to get the correct display strings based on current unit settings
+    const getUnitStrings = (state) => {
+        const altString = state.baroAltitude
+            ? (altitudeUnit === 'ft'
+                ? `${Math.round(state.baroAltitude * 3.28084)} ft`
+                : `${Math.round(state.baroAltitude)} m`)
+            : 'N/A';
+        const speedString = state.velocity
+            ? (speedUnit === 'kn'
+                ? `${Math.round(state.velocity * 1.94384)} kn`
+                : `${Math.round(state.velocity * 3.6)} km/h`)
+            : 'N/A';
+        return { altString, speedString };
+    };
     if (data.states && Array.isArray(data.states)) {
         data.states.forEach(state => {
             const icao24 = state.icao24;
@@ -174,14 +190,16 @@ function processFlightData(data) {
                     marker._animLng = currentLatLng.lng;
                     marker._animTime = performance.now();
 
+                    const { altString, speedString } = getUnitStrings(state);
+
                     // update popup content
                     const popupContent = `\
                                             <strong>${state.callsign}</strong><br>\
                                             ICAO24: ${icao24}<br>\
                                             Country: ${state.originCountry}<br>\
                                             Type: ${state.category}<br>\
-                                            Altitude: ${state.baroAltitude ? Math.round(state.baroAltitude) + ' m' : 'N/A'}<br>\
-                                            Velocity: ${state.velocity ? Math.round(state.velocity * 3.6) + ' km/h' : 'N/A'}<br>\
+                                            Altitude: ${altString}<br>\
+                                            Velocity: ${speedString}<br>\
                                             Track: ${state.trueTrack ? Math.round(state.trueTrack) + '°' : 'N/A'}`;
 
                     marker.getPopup() && marker.setPopupContent(popupContent);
@@ -212,26 +230,30 @@ function processFlightData(data) {
 
                     marker.on('add', () => applyRotationToMarker(marker, marker._track));
 
+                    const { altString, speedString } = getUnitStrings(state);
+
                     const popupContent = `\
                                             <strong>${state.callsign}</strong><br>\
                                             ICAO24: ${icao24}<br>\
                                             Country: ${state.originCountry}<br>\
                                             Type: ${state.category}<br>\
-                                            Altitude: ${state.baroAltitude ? Math.round(state.baroAltitude) + ' m' : 'N/A'}<br>\
-                                            Velocity: ${state.velocity ? Math.round(state.velocity * 3.6) + ' km/h' : 'N/A'}<br>\
+                                            Altitude: ${altString}<br>\
+                                            Velocity: ${speedString}<br>\
                                             Track: ${state.trueTrack ? Math.round(state.trueTrack) + '°' : 'N/A'}`;
 
                     marker.bindPopup(popupContent);
 
                     marker.on('click', () => {
                         const detailsElement = document.getElementById('aircraft-details');
+                        // Re-calculate on click to ensure it uses the latest unit selection
+                        const { altString: currentAltString, speedString: currentSpeedString } = getUnitStrings(state);
                         detailsElement.innerHTML = `\
                                                 <strong>${state.callsign}</strong><br>\
                                                 ICAO24: ${icao24}<br>\
                                                 Country: ${state.originCountry}<br>\
                                                 Type: ${state.category}<br>\
-                                                Altitude: ${state.baroAltitude ? Math.round(state.baroAltitude) + ' m' : 'N/A'}<br>\
-                                                Velocity: ${state.velocity ? Math.round(state.velocity * 3.6) + ' km/h' : 'N/A'}<br>\
+                                                Altitude: ${currentAltString}<br>\
+                                                Velocity: ${currentSpeedString}<br>\
                                                 Track: ${state.trueTrack ? Math.round(state.trueTrack) + '°' : 'N/A'}<br>\
                                                 Vertical Rate: ${state.verticalRate ? Math.round(state.verticalRate) + ' m/s' : 'N/A'}<br>\
                                                 On Ground: ${state.onGround ? 'Yes' : 'No'}`;
@@ -419,6 +441,18 @@ document.getElementById('toggle-animation').addEventListener('click', function (
     } else {
         clearInterval(intervalId);
     }
+});
+
+// Unit selection handlers
+document.getElementById('altitude-unit-select').addEventListener('change', function () {
+    altitudeUnit = this.value;
+    // Re-process existing data to update all labels without a new fetch
+    processFlightData({ states: Object.values(aircraftData) });
+});
+
+document.getElementById('speed-unit-select').addEventListener('change', function () {
+    speedUnit = this.value;
+    processFlightData({ states: Object.values(aircraftData) });
 });
 
 // Sidebar toggle functionality

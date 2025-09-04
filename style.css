@@ -139,6 +139,19 @@
         flex: 1;
     }
 
+    .display-options {
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background-color: rgba(65, 90, 119, 0.3);
+        border-radius: 8px;
+    }
+
+    .display-options h3 {
+        margin-bottom: 0.75rem;
+        border-bottom: 1px solid #415a77;
+        padding-bottom: 0.5rem;
+    }
+
     .stats {
         margin: 1.5rem 0;
         padding: 1rem;
