@@ -41,8 +41,8 @@ L.control.zoom({ position: "bottomright" }).addTo(map);
 
 
 // Performance & state
-let updateInterval = 3000; // ms
-let maxFlightsToShow = 100;
+let updateInterval = 1000; // ms
+let maxFlightsToShow = 200;
 let animationEnabled = true;
 let intervalId = null;
 let altitudeUnit = 'm'; // 'm' or 'ft'
@@ -354,43 +354,6 @@ async function fetchFlightData() {
     }
 }
 
-// async function fetchFlightData() {
-//     if (!animationEnabled) return;
-//     showLoading();
-//     try {
-//         const response = await fetch("https://opensky-network.org/api/states/all");
-//         const json = await response.json();
-
-//         // Convert OpenSky array format into your object format
-//         const states = (json.states || []).map(s => ({
-//             icao24: s[0],
-//             callsign: s[1] ? s[1].trim() : "N/A",
-//             originCountry: s[2],
-//             timePosition: s[3],
-//             lastContact: s[4],
-//             longitude: s[5],
-//             latitude: s[6],
-//             baroAltitude: s[7],
-//             onGround: s[8],
-//             velocity: s[9],
-//             trueTrack: s[10],
-//             verticalRate: s[11],
-//             sensors: s[12],
-//             geoAltitude: s[13],
-//             squawk: s[14],
-//             spi: s[15],
-//             positionSource: s[16],
-//             category: "commercial" // You can refine this mapping later
-//         }));
-
-//         processFlightData({ states });
-//     } catch (err) {
-//         console.error("Error fetching data", err);
-//     } finally {
-//         hideLoading();
-//     }
-// }
-
 
 // ---------------------- UI event handlers -------------------------
 document.getElementById('view-select').addEventListener('change', function () {
@@ -514,19 +477,6 @@ document.getElementById('sidebar-toggle').addEventListener('click', function () 
     }
 
     // Trigger map resize to ensure it renders correctly
-    setTimeout(() => {
-        map.invalidateSize();
-    }, 300);
-});
-
-document.getElementById('sidebar-close').addEventListener('click', function () {
-    document.getElementById('sidebar').classList.add('closed');
-    document.body.classList.remove('sidebar-open');
-    document.body.classList.add('sidebar-closed');
-    document.getElementById('sidebar-toggle').style.left = '15px';
-    document.getElementById('sidebar-toggle').innerHTML = '<i class="fas fa-bars"></i>';
-
-    // Trigger map resize
     setTimeout(() => {
         map.invalidateSize();
     }, 300);

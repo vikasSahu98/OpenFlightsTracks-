@@ -26,8 +26,8 @@
         top: 15px;
         left: 335px; /* Positioned to the right of the sidebar */
         z-index: 1002;
-        background-color: rgba(27, 38, 59, 0.65);
-        backdrop-filter: blur(12px);
+        background-color: rgba(27, 38, 59, 0.55);
+        backdrop-filter: blur(14px);
         color: #e0e1dd;
         width: 40px;
         height: 40px;
@@ -42,7 +42,7 @@
     }
 
     .sidebar-toggle:hover {
-        background-color: #415a77;
+        background-color: rgba(65, 90, 119, 0.7);
     }
 
     .sidebar {
@@ -51,8 +51,8 @@
         top: 0;
         height: 100%;
         width: 320px;
-        background-color: rgba(27, 38, 59, 0.75);
-        backdrop-filter: blur(15px);
+        background-color: rgba(27, 38, 59, 0.6);
+        backdrop-filter: blur(20px);
         z-index: 1001;
         overflow-y: auto;
         transform: translateX(0); /* Sidebar open by default */
@@ -71,7 +71,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 1rem;
-        background-color: rgba(255, 255, 255, 0.05);
+        background-color: rgba(255, 255, 255, 0.07);
         border-bottom: 1px solid rgba(65, 90, 119, 0.5);
     }
 
@@ -116,7 +116,7 @@
         padding: 0.5rem;
         border: none;
         border-radius: 4px;
-        background-color: rgba(65, 90, 119, 0.4);
+        background-color: rgba(65, 90, 119, 0.35);
         color: #e0e1dd;
         border: 1px solid rgba(224, 225, 221, 0.2);
     }
@@ -126,7 +126,7 @@
         padding: 0.75rem;
         border: none;
         border-radius: 4px;
-        background-color: rgba(65, 90, 119, 0.5);
+        background-color: rgba(65, 90, 119, 0.4);
         color: #e0e1dd;
         cursor: pointer;
         text-align: left;
@@ -136,7 +136,7 @@
     }
 
     .sidebar-btn:hover {
-        background-color: rgba(119, 141, 169, 0.6);
+        background-color: rgba(119, 141, 169, 0.55);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
@@ -213,12 +213,12 @@
         position: absolute;
         bottom: 20px;
         left: 340px; /* Positioned to the right of the sidebar */
-        background-color: rgba(27, 38, 59, 0.75);
+        background-color: rgba(27, 38, 59, 0.6);
         padding: 1rem;
         border-radius: 8px;
         z-index: 1000;
         max-width: 320px;
-        backdrop-filter: blur(15px);
+        backdrop-filter: blur(20px);
         border: 1px solid rgba(224, 225, 221, 0.1);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         transition: left 0.3s ease;
@@ -241,8 +241,8 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background-color: rgba(27, 38, 59, 0.75);
-        backdrop-filter: blur(12px);
+        background-color: rgba(27, 38, 59, 0.6);
+        backdrop-filter: blur(14px);
         padding: 1rem 2rem;
         border-radius: 8px;
         z-index: 1001;
@@ -316,9 +316,9 @@
 
     /* small visual helper for popup readability */
     .leaflet-popup-content-wrapper {
-        background: rgba(27, 38, 59, 0.75);
+        background: rgba(27, 38, 59, 0.65);
         color: #e0e1dd;
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(14px);
         border-radius: 8px;
         border: 1px solid rgba(224, 225, 221, 0.1);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
