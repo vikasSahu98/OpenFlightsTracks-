@@ -36,6 +36,7 @@ L.control.layers(baseLayers, null, { position: "topright" }).addTo(map);
 
 // ------------------------- Zoom control at bottom-left -------------------------
 map.zoomControl.remove(); // remove default top-left zoom
+L.control.scale({ position: "bottomright" }).addTo(map);
 L.control.zoom({ position: "bottomright" }).addTo(map);
 
 
@@ -352,6 +353,44 @@ async function fetchFlightData() {
         hideLoading();
     }
 }
+
+// async function fetchFlightData() {
+//     if (!animationEnabled) return;
+//     showLoading();
+//     try {
+//         const response = await fetch("https://opensky-network.org/api/states/all");
+//         const json = await response.json();
+
+//         // Convert OpenSky array format into your object format
+//         const states = (json.states || []).map(s => ({
+//             icao24: s[0],
+//             callsign: s[1] ? s[1].trim() : "N/A",
+//             originCountry: s[2],
+//             timePosition: s[3],
+//             lastContact: s[4],
+//             longitude: s[5],
+//             latitude: s[6],
+//             baroAltitude: s[7],
+//             onGround: s[8],
+//             velocity: s[9],
+//             trueTrack: s[10],
+//             verticalRate: s[11],
+//             sensors: s[12],
+//             geoAltitude: s[13],
+//             squawk: s[14],
+//             spi: s[15],
+//             positionSource: s[16],
+//             category: "commercial" // You can refine this mapping later
+//         }));
+
+//         processFlightData({ states });
+//     } catch (err) {
+//         console.error("Error fetching data", err);
+//     } finally {
+//         hideLoading();
+//     }
+// }
+
 
 // ---------------------- UI event handlers -------------------------
 document.getElementById('view-select').addEventListener('change', function () {

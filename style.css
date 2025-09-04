@@ -24,10 +24,10 @@
     .sidebar-toggle {
         position: fixed;
         top: 15px;
-        left: 335px;
-        /* Positioned to the right of the sidebar */
+        left: 335px; /* Positioned to the right of the sidebar */
         z-index: 1002;
-        background-color: #1b263b;
+        background-color: rgba(27, 38, 59, 0.65);
+        backdrop-filter: blur(12px);
         color: #e0e1dd;
         width: 40px;
         height: 40px;
@@ -36,7 +36,8 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(224, 225, 221, 0.1);
         transition: all 0.3s ease;
     }
 
@@ -50,13 +51,14 @@
         top: 0;
         height: 100%;
         width: 320px;
-        background-color: #1b263b;
+        background-color: rgba(27, 38, 59, 0.75);
+        backdrop-filter: blur(15px);
         z-index: 1001;
         overflow-y: auto;
-        transform: translateX(0);
-        /* Sidebar open by default */
+        transform: translateX(0); /* Sidebar open by default */
         transition: transform 0.3s ease;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3);
+        border-right: 1px solid rgba(224, 225, 221, 0.1);
     }
 
     .sidebar.closed {
@@ -69,7 +71,8 @@
         justify-content: space-between;
         align-items: center;
         padding: 1rem;
-        border-bottom: 1px solid #415a77;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(65, 90, 119, 0.5);
     }
 
     .sidebar-close {
@@ -84,6 +87,17 @@
 
     .sidebar-content {
         padding: 1rem;
+    }
+
+    .controls,
+    .performance-controls,
+    .display-options,
+    .stats,
+    .legend {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1.5rem 0;
     }
 
     .control-group {
@@ -102,8 +116,9 @@
         padding: 0.5rem;
         border: none;
         border-radius: 4px;
-        background-color: #415a77;
+        background-color: rgba(65, 90, 119, 0.4);
         color: #e0e1dd;
+        border: 1px solid rgba(224, 225, 221, 0.2);
     }
 
     .sidebar-btn {
@@ -111,16 +126,18 @@
         padding: 0.75rem;
         border: none;
         border-radius: 4px;
-        background-color: #415a77;
+        background-color: rgba(65, 90, 119, 0.5);
         color: #e0e1dd;
         cursor: pointer;
         text-align: left;
-        transition: background-color 0.3s;
+        transition: background-color 0.3s, box-shadow 0.3s;
         margin-bottom: 0.5rem;
+        border: 1px solid rgba(224, 225, 221, 0.2);
     }
 
     .sidebar-btn:hover {
-        background-color: #778da9;
+        background-color: rgba(119, 141, 169, 0.6);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     .sidebar-btn i {
@@ -139,30 +156,20 @@
         flex: 1;
     }
 
-    .display-options {
-        margin: 1.5rem 0;
-        padding: 1rem;
-        background-color: rgba(65, 90, 119, 0.3);
-        border-radius: 8px;
-    }
-
     .display-options h3 {
         margin-bottom: 0.75rem;
-        border-bottom: 1px solid #415a77;
+        border-bottom: 1px solid rgba(65, 90, 119, 0.5);
         padding-bottom: 0.5rem;
     }
 
-    .stats {
-        margin: 1.5rem 0;
-        padding: 1rem;
-        background-color: rgba(65, 90, 119, 0.3);
-        border-radius: 8px;
-    }
-
-    .stats h3 {
+    .controls h3,
+    .performance-controls h3,
+    .stats h3,
+    .legend h3 {
         margin-bottom: 0.75rem;
-        border-bottom: 1px solid #415a77;
+        border-bottom: 1px solid rgba(65, 90, 119, 0.5);
         padding-bottom: 0.5rem;
+        margin-top: -0.5rem;
     }
 
     .stat-item {
@@ -174,16 +181,6 @@
     .stat-value {
         font-weight: bold;
         color: #778da9;
-    }
-
-    .legend {
-        margin-top: 1.5rem;
-    }
-
-    .legend h3 {
-        margin-bottom: 0.75rem;
-        border-bottom: 1px solid #415a77;
-        padding-bottom: 0.5rem;
     }
 
     .legend-item {
@@ -215,14 +212,15 @@
     .info-panel {
         position: absolute;
         bottom: 20px;
-        left: 340px;
-        /* Positioned to the right of the sidebar */
-        background-color: rgba(27, 38, 59, 0.92);
+        left: 340px; /* Positioned to the right of the sidebar */
+        background-color: rgba(27, 38, 59, 0.75);
         padding: 1rem;
         border-radius: 8px;
         z-index: 1000;
         max-width: 320px;
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(224, 225, 221, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         transition: left 0.3s ease;
     }
 
@@ -234,7 +232,7 @@
     .aircraft-info {
         margin-top: 0.5rem;
         padding-top: 0.5rem;
-        border-top: 1px solid #778da9;
+        border-top: 1px solid rgba(119, 141, 169, 0.5);
     }
 
     .loading {
@@ -243,17 +241,17 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background-color: rgba(27, 38, 59, 0.95);
+        background-color: rgba(27, 38, 59, 0.75);
+        backdrop-filter: blur(12px);
         padding: 1rem 2rem;
         border-radius: 8px;
         z-index: 1001;
         text-align: center;
+        border: 1px solid rgba(224, 225, 221, 0.1);
     }
 
-    .performance-controls {
-        margin: 1.5rem 0;
-    }
 
+    
     @media (max-width: 768px) {
         .sidebar {
             width: 280px;
@@ -318,6 +316,10 @@
 
     /* small visual helper for popup readability */
     .leaflet-popup-content-wrapper {
-        background: rgba(20, 30, 40, 0.98);
+        background: rgba(27, 38, 59, 0.75);
         color: #e0e1dd;
+        backdrop-filter: blur(10px);
+        border-radius: 8px;
+        border: 1px solid rgba(224, 225, 221, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
