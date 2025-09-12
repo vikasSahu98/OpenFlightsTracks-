@@ -1,4 +1,3 @@
-
 // Map init
 const map = L.map('map').setView([20.5937, 78.9629], 5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -24,7 +23,7 @@ const baseLayers = {
     }),
 
     "Satellite (ESRI)": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-        attribution: "Tiles © Esri &mdash; Source: Esri, Earthstar Geographics"
+        attribution: "Tiles Â© Esri &mdash; Source: Esri, Earthstar Geographics"
     })
 };
 
@@ -39,7 +38,6 @@ map.zoomControl.remove(); // remove default top-left zoom
 L.control.scale({ position: "bottomright" }).addTo(map);
 L.control.zoom({ position: "bottomright" }).addTo(map);
 
-
 // Performance & state
 let updateInterval = 1000; // ms
 let maxFlightsToShow = 200;
@@ -53,6 +51,9 @@ const aircraftMarkers = {};   // icao24 -> L.marker
 const aircraftTracks = {};    // icao24 -> L.polyline
 const aircraftData = {};      // icao24 -> latest state
 
+// Selected aircraft for info panel updates
+let selectedAircraftIcao = null;
+
 // FPS tracking
 let lastFPSCheck = performance.now();
 let frameCounter = 0;
@@ -60,6 +61,13 @@ let frameCounter = 0;
 // ------------------------- helpers ------------------------------
 function showLoading() { document.getElementById('loading-indicator').style.display = 'block'; }
 function hideLoading() { document.getElementById('loading-indicator').style.display = 'none'; }
+
+// Helper function to format coordinates
+function formatCoordinates(lat, lng) {
+    const latStr = Math.abs(lat).toFixed(6) + (lat >= 0 ? 'N' : 'S');
+    const lngStr = Math.abs(lng).toFixed(6) + (lng >= 0 ? 'E' : 'W');
+    return { latStr, lngStr };
+}
 
 function createAircraftIcon(category) {
     const className = `aircraft-icon ${category || ''}`;
@@ -81,6 +89,43 @@ function applyRotationToMarker(marker, angleDeg) {
     if (!svg) return;
     svg.style.transformOrigin = '50% 50%';
     svg.style.transform = `rotate(${angleDeg}deg)`;
+}
+
+// Helper function to create popup content with coordinates
+function createPopupContent(state, lat, lng) {
+    const { altString, speedString } = getUnitStrings(state);
+    const { latStr, lngStr } = formatCoordinates(lat, lng);
+    
+    return `\
+<strong>${state.callsign}</strong><br>\
+CIFOS: ${state.icao24}<br>\
+Country: ${state.originCountry}<br>\
+Type: ${state.category}<br>\
+Latitude: ${latStr}<br>\
+Longitude: ${lngStr}<br>\
+Altitude: ${altString}<br>\
+Velocity: ${speedString}<br>\
+Track: ${state.trueTrack ? Math.round(state.trueTrack) + 'Â°' : 'N/A'}`;
+}
+
+// Helper function to update info panel with coordinates
+function updateInfoPanel(state, lat, lng) {
+    const detailsElement = document.getElementById('aircraft-details');
+    const { altString, speedString } = getUnitStrings(state);
+    const { latStr, lngStr } = formatCoordinates(lat, lng);
+    
+    detailsElement.innerHTML = `\
+<strong>${state.callsign}</strong><br>\
+CIFOS: ${state.icao24}<br>\
+Country: ${state.originCountry}<br>\
+Type: ${state.category}<br>\
+Latitude: ${latStr}<br>\
+Longitude: ${lngStr}<br>\
+Altitude: ${altString}<br>\
+Velocity: ${speedString}<br>\
+Track: ${state.trueTrack ? Math.round(state.trueTrack) + 'Â°' : 'N/A'}<br>\
+Vertical Rate: ${state.verticalRate ? Math.round(state.verticalRate) + ' m/s' : 'N/A'}<br>\
+On Ground: ${state.onGround ? 'Yes' : 'No'}`;
 }
 
 // ---------------------- simulated data generator -----------------
@@ -144,20 +189,6 @@ function processFlightData(data) {
     let activeCount = 0;
     let visibleCount = 0;
 
-    // Helper function to get the correct display strings based on current unit settings
-    const getUnitStrings = (state) => {
-        const altString = state.baroAltitude
-            ? (altitudeUnit === 'ft'
-                ? `${Math.round(state.baroAltitude * 3.28084)} ft`
-                : `${Math.round(state.baroAltitude)} m`)
-            : 'N/A';
-        const speedString = state.velocity
-            ? (speedUnit === 'kn'
-                ? `${Math.round(state.velocity * 1.94384)} kn`
-                : `${Math.round(state.velocity * 3.6)} km/h`)
-            : 'N/A';
-        return { altString, speedString };
-    };
     if (data.states && Array.isArray(data.states)) {
         data.states.forEach(state => {
             const icao24 = state.icao24;
@@ -191,19 +222,14 @@ function processFlightData(data) {
                     marker._animLng = currentLatLng.lng;
                     marker._animTime = performance.now();
 
-                    const { altString, speedString } = getUnitStrings(state);
-
-                    // update popup content
-                    const popupContent = `\
-                                            <strong>${state.callsign}</strong><br>\
-                                            ICAO24: ${icao24}<br>\
-                                            Country: ${state.originCountry}<br>\
-                                            Type: ${state.category}<br>\
-                                            Altitude: ${altString}<br>\
-                                            Velocity: ${speedString}<br>\
-                                            Track: ${state.trueTrack ? Math.round(state.trueTrack) + '°' : 'N/A'}`;
-
+                    // Update popup content with current coordinates
+                    const popupContent = createPopupContent(state, currentLatLng.lat, currentLatLng.lng);
                     marker.getPopup() && marker.setPopupContent(popupContent);
+
+                    // Update info panel if this aircraft is selected
+                    if (selectedAircraftIcao === icao24) {
+                        updateInfoPanel(state, currentLatLng.lat, currentLatLng.lng);
+                    }
 
                     // draw track polyline if enabled
                     if (window._tracksVisible && aircraftTracks[icao24]) {
@@ -231,33 +257,13 @@ function processFlightData(data) {
 
                     marker.on('add', () => applyRotationToMarker(marker, marker._track));
 
-                    const { altString, speedString } = getUnitStrings(state);
-
-                    const popupContent = `\
-                                            <strong>${state.callsign}</strong><br>\
-                                            ICAO24: ${icao24}<br>\
-                                            Country: ${state.originCountry}<br>\
-                                            Type: ${state.category}<br>\
-                                            Altitude: ${altString}<br>\
-                                            Velocity: ${speedString}<br>\
-                                            Track: ${state.trueTrack ? Math.round(state.trueTrack) + '°' : 'N/A'}`;
-
+                    const popupContent = createPopupContent(state, state.latitude, state.longitude);
                     marker.bindPopup(popupContent);
 
                     marker.on('click', () => {
-                        const detailsElement = document.getElementById('aircraft-details');
-                        // Re-calculate on click to ensure it uses the latest unit selection
-                        const { altString: currentAltString, speedString: currentSpeedString } = getUnitStrings(state);
-                        detailsElement.innerHTML = `\
-                                                <strong>${state.callsign}</strong><br>\
-                                                ICAO24: ${icao24}<br>\
-                                                Country: ${state.originCountry}<br>\
-                                                Type: ${state.category}<br>\
-                                                Altitude: ${currentAltString}<br>\
-                                                Velocity: ${currentSpeedString}<br>\
-                                                Track: ${state.trueTrack ? Math.round(state.trueTrack) + '°' : 'N/A'}<br>\
-                                                Vertical Rate: ${state.verticalRate ? Math.round(state.verticalRate) + ' m/s' : 'N/A'}<br>\
-                                                On Ground: ${state.onGround ? 'Yes' : 'No'}`;
+                        selectedAircraftIcao = icao24;
+                        const currentLatLng = marker.getLatLng();
+                        updateInfoPanel(state, currentLatLng.lat, currentLatLng.lng);
                     });
 
                     aircraftMarkers[icao24] = marker;
@@ -282,12 +288,33 @@ function processFlightData(data) {
                 try { map.removeLayer(aircraftTracks[icao]); } catch (e) { }
                 delete aircraftTracks[icao];
             }
+
+            // Clear info panel if this aircraft was selected
+            if (selectedAircraftIcao === icao) {
+                selectedAircraftIcao = null;
+                document.getElementById('aircraft-details').innerHTML = '';
+            }
         }
     }
 
     document.getElementById('active-flights').textContent = activeCount;
     document.getElementById('visible-flights').textContent = visibleCount;
     document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+}
+
+// Helper function to get the correct display strings based on current unit settings
+function getUnitStrings(state) {
+    const altString = state.baroAltitude
+        ? (altitudeUnit === 'ft'
+            ? `${Math.round(state.baroAltitude * 3.28084)} ft`
+            : `${Math.round(state.baroAltitude)} m`)
+        : 'N/A';
+    const speedString = state.velocity
+        ? (speedUnit === 'kn'
+            ? `${Math.round(state.velocity * 1.94384)} kn`
+            : `${Math.round(state.velocity * 3.6)} km/h`)
+        : 'N/A';
+    return { altString, speedString };
 }
 
 // ---------------------- continuous animation loop -----------------------
@@ -330,7 +357,20 @@ function animationLoop(now) {
             marker._animLng = marker._animLng + deltaLngDeg;
             marker._animTime = nowMs;
 
-            try { marker.setLatLng([marker._animLat, marker._animLng]); } catch (e) { }
+            try { 
+                marker.setLatLng([marker._animLat, marker._animLng]); 
+                
+                // Update popup content with real-time coordinates if popup is open
+                if (marker.getPopup().isOpen() && marker._state) {
+                    const popupContent = createPopupContent(marker._state, marker._animLat, marker._animLng);
+                    marker.setPopupContent(popupContent);
+                }
+                
+                // Update info panel with real-time coordinates if this aircraft is selected
+                if (selectedAircraftIcao === icao24 && marker._state) {
+                    updateInfoPanel(marker._state, marker._animLat, marker._animLng);
+                }
+            } catch (e) { }
 
             applyRotationToMarker(marker, track);
         }
@@ -353,7 +393,6 @@ async function fetchFlightData() {
         hideLoading();
     }
 }
-
 
 // ---------------------- UI event handlers -------------------------
 document.getElementById('view-select').addEventListener('change', function () {
@@ -418,6 +457,7 @@ document.getElementById('reset-view').addEventListener('click', function () {
     document.getElementById('aircraft-group').style.display = 'none';
     document.getElementById('aircraft-input').value = '';
     document.getElementById('aircraft-details').innerHTML = '';
+    selectedAircraftIcao = null;
     fetchFlightData();
 });
 
